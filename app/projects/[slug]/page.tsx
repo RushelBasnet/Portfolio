@@ -1,0 +1,14 @@
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { ArrowLeft, ArrowUpRight, CheckCircle2 } from 'lucide-react';
+import { projects } from '@/lib/projects';
+
+export function generateStaticParams() { return projects.map((project) => ({ slug: project.slug })); }
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params; const project = projects.find((item) => item.slug === slug);
+  return { title: project ? `${project.title} — Rushel Basnet` : 'Project — Rushel Basnet', description: project?.summary };
+}
+export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params; const project = projects.find((item) => item.slug === slug); if (!project) notFound();
+  return <article className="container case-study"><Link href="/#work" className="back-link"><ArrowLeft size={16}/> Back to all projects</Link><header className="case-hero"><p className="eyebrow">PROJECT {project.number} · {project.category}</p><h1>{project.title}</h1><p className="case-summary">{project.summary}</p><div className="case-actions">{project.github && <a className="button button-dark" href={project.github} target="_blank" rel="noreferrer">View on GitHub <ArrowUpRight size={16}/></a>}{project.demo && <a className="button button-light" href={project.demo} target="_blank" rel="noreferrer">Watch demo <ArrowUpRight size={16}/></a>}</div></header><div className="case-content"><section className="case-main"><div className="case-block"><p className="eyebrow">01 / THE PROBLEM</p><h2>What I wanted to improve</h2><p>{project.problem}</p></div><div className="case-block"><p className="eyebrow">02 / THE APPROACH</p><h2>How it works</h2><ul className="approach-list">{project.approach.map((item) => <li key={item}><CheckCircle2 size={18}/><span>{item}</span></li>)}</ul></div><div className="case-block"><p className="eyebrow">03 / TECHNOLOGY</p><h2>Tools and building blocks</h2><div className="stack-list">{project.stack.map((item) => <span key={item}>{item}</span>)}</div></div></section><aside className="case-sidebar"><div className="sidebar-card"><p className="eyebrow">PROJECT STATUS</p><h3>{project.status}</h3><p>Details on this page describe the current portfolio summary.{project.github && ' Check the repository for implementation specifics and setup instructions.'}</p>{project.metric && <div className="metric"><strong>{project.metric}</strong><span>{project.metricLabel}</span></div>}{project.github && <a href={project.github} target="_blank" rel="noreferrer" className="text-link">Open repository <ArrowUpRight size={16}/></a>}</div></aside></div><div className="case-next"><p className="eyebrow">NEXT STEP</p><h2>Have a similar problem?</h2><a className="text-link" href="mailto:rushelbasnet22@gmail.com">Let’s discuss it <ArrowUpRight size={16}/></a></div></article>;
+}
